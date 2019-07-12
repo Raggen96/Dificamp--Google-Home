@@ -21,11 +21,10 @@ import java.util.ResourceBundle;
 public class MyActionsApp extends DialogflowApp {
 
 
-
     private final Logger LOGGER = (Logger) LoggerFactory.getLogger(MyActionsApp.class);
 
     @ForIntent("Default Welcome Intent")
-    public ActionResponse welcome(ActionRequest request){
+    public ActionResponse welcome(ActionRequest request) {
         LOGGER.info("Welcome intent start.");
         ResponseBuilder response = getResponseBuilder(request);
         if (request.getUser().getUserVerificationStatus().equals("VERIFIED")) {
@@ -34,7 +33,7 @@ public class MyActionsApp extends DialogflowApp {
             Permission permission =
                     new Permission()
                             .setContext(formatResponse("permission_reason"))
-                            .setPermissions(new String[] {ConstantsKt.PERMISSION_NAME});
+                            .setPermissions(new String[]{ConstantsKt.PERMISSION_NAME});
             response.add("PLACEHOLDER_FOR_PERMISSION");
             response.add(permission);
         }
@@ -43,7 +42,7 @@ public class MyActionsApp extends DialogflowApp {
 
 
     @ForIntent("HelloWorld")
-    public ActionResponse helloIntent(ActionRequest request){
+    public ActionResponse helloIntent(ActionRequest request) {
         LOGGER.info("Welcome to Hello World");
         System.out.println("Helloworld intent triggered");
         ResponseBuilder responseBuilder = getResponseBuilder(request);
@@ -63,6 +62,7 @@ public class MyActionsApp extends DialogflowApp {
         LOGGER.info("Bye intent end.");
         return responseBuilder.build();
     }
+
     private String readResponse(String response) {
         ResourceBundle bundle = ResourceBundle.getBundle("resources");
         return bundle.getString(response);
@@ -73,13 +73,13 @@ public class MyActionsApp extends DialogflowApp {
     }
 
     @ForIntent("Sign in")
-    public ActionResponse signIn(ActionRequest request){
+    public ActionResponse signIn(ActionRequest request) {
+        LOGGER.info("Sign in intent started");
         ResponseBuilder responseBuilder = getResponseBuilder(request);
+
         return responseBuilder.add("This is the SignIn helper intent").add(new SignIn()).build();
+
     }
-
-
-
 
 
     @ForIntent("Check Reservation")
@@ -88,19 +88,14 @@ public class MyActionsApp extends DialogflowApp {
         ResponseBuilder responseBuilder = getResponseBuilder(request);
         String accessToken = request.getUser().getAccessToken();
         boolean signedIn = request.isSignInGranted();
-        if (signedIn != true) {
-            return responseBuilder
-                    .add("You must sign in before using the app.")
-                    .build();
-        } else if (accessToken == null) {
+        if (accessToken == null) {
             return responseBuilder
                     .add("You have no access token. Please sign inn.")
                     .build();
 
         }
-
         try {
-
+            LOGGER.info("Reservation intent started");
             String url = "https://oidc-ver1.difi.no/kontaktinfo-oauth2-server/rest/v1/person";
             OkHttpClient client = new OkHttpClient();
 
@@ -126,6 +121,7 @@ public class MyActionsApp extends DialogflowApp {
             return responseBuilder
                     .add(returnText)
                     .build();
+
         } catch (IOException e) {
             e.printStackTrace();
             return responseBuilder
